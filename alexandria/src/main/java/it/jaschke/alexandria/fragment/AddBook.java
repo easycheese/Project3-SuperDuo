@@ -24,12 +24,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.util.NetworkManager;
+import it.jaschke.alexandria.util.ScanManager;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, View.OnClickListener {
@@ -39,7 +42,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private static final String SCAN_FORMAT = "scanFormat";
     private static final String SCAN_CONTENTS = "scanContents";
 
+    private static final int REQUEST_IMAGE_CAPTURE = 153;
     private String mScanFormat = "Format:";
+
     private String mScanContents = "Contents:";
 
     @Bind(R.id.ean) EditText ean;
@@ -207,12 +212,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
             // are using an external app.
             //when you're done, remove the toast below.
-            Context context = getActivity();
-            CharSequence text = "This button should let you scan a book for its barcode!";
-            int duration = Toast.LENGTH_SHORT;
+//            Context context = getActivity();
+//            CharSequence text = "This button should let you scan a book for its barcode!";
+//            int duration = Toast.LENGTH_SHORT;
+//
+//            Toast toast = Toast.makeText(context, text, duration);
+//            toast.show();
 
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            Intent i = ScanManager.getTakePictureIntent(getActivity());
+            startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
         } else if (v == saveButton) {
             ean.setText("");
         } else if (v == deleteButton) {
@@ -221,6 +229,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             bookIntent.setAction(BookService.DELETE_BOOK);
             getActivity().startService(bookIntent);
             ean.setText("");
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), data);// TODO async this
+            int x=0;
+            x++;
         }
     }
 }
