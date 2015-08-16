@@ -3,6 +3,7 @@ package it.jaschke.alexandria.util;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.SparseArray;
@@ -12,6 +13,8 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.util.ArrayList;
+
+import it.jaschke.alexandria.R;
 
 /**
  * Created by Kyle on 8/16/2015
@@ -40,7 +43,7 @@ public class ScanManager {
     private static SparseArray<Barcode> getBarcodes(Context ctx, Bitmap bitmap) {
         BarcodeDetector detector =
                 new BarcodeDetector.Builder(ctx.getApplicationContext())
-                        .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
+                        .setBarcodeFormats(Barcode.EAN_13 | Barcode.EAN_8)
                         .build();
         Frame frame = new Frame.Builder().setBitmap(bitmap).build();
          return detector.detect(frame);
@@ -54,5 +57,13 @@ public class ScanManager {
             barcodeResults.add(barcode.rawValue);
         }
         return barcodeResults;
+    }
+
+    public static ArrayList<String> getTestImage(Context ctx) { // TODO remove
+        Bitmap myBitmap = BitmapFactory.decodeResource(
+                ctx.getApplicationContext().getResources(),
+                R.drawable.isbn_test);
+        SparseArray<Barcode> barcodes = getBarcodes(ctx, myBitmap);
+        return getBarcodeText(barcodes);
     }
 }

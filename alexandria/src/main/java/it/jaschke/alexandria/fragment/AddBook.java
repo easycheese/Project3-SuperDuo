@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -221,6 +222,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             Intent i = ScanManager.getTakePictureIntent(getActivity());
             startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
+
+//            ArrayList<String> test = ScanManager.getTestImage(getActivity());
+//            int x=0;
+//            x++;
+
         } else if (v == saveButton) {
             ean.setText("");
         } else if (v == deleteButton) {
