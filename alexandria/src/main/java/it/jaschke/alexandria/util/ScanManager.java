@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.gms.vision.Frame;
@@ -18,7 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import it.jaschke.alexandria.R;
+import it.jaschke.alexandria.model.BarcodeException;
+
 
 /**
  * Created by Kyle on 8/16/2015
@@ -39,26 +39,33 @@ public class ScanManager {
 
         return null; //TODO error handling
     }
-    public static ArrayList<String> getBarcodeResultsFromImage(Context ctx, Intent data) { // TODO remove?
-        Bitmap bitmap = getBitmapFromIntent(data);
-        SparseArray<Barcode> barcodes = getBarcodes(ctx, bitmap);
-        return getBarcodeText(barcodes);
-    }
-    public static ArrayList<String> getBarcodeResultsFromImage(Context ctx, Bitmap bitmap) {
-        SparseArray<Barcode> barcodes = getBarcodes(ctx, bitmap);
+
+    public static ArrayList<String> getBarcodeData(Context ctx, Bitmap bitmap) throws BarcodeException {
+        SparseArray<Barcode> barcodes = getBarcodesFromImage(ctx, bitmap);
         return getBarcodeText(barcodes);
     }
 
-    private static Bitmap getBitmapFromIntent(Intent data) {
-        Bundle extras = data.getExtras();
-        return (Bitmap) extras.get("data");
-    }
+    private static SparseArray<Barcode> getBarcodesFromImage(Context ctx, Bitmap bitmap) throws BarcodeException {
 
-    private static SparseArray<Barcode> getBarcodes(Context ctx, Bitmap bitmap) {
         BarcodeDetector detector =
                 new BarcodeDetector.Builder(ctx.getApplicationContext())
                         .setBarcodeFormats(Barcode.EAN_13 | Barcode.EAN_8)
                         .build();
+
+        if (!detector.isOperational()) {
+            // Note: The first time that an app using the barcode or face API is installed on a
+            // device, GMS will download a native libraries to the device in order to do detection.
+            // Usually this completes before the app is run for the first time.  But if that
+            // download has not yet completed, then the above call will not detect any barcodes
+            // and/or faces.
+            //
+            // isOperational() can be used to check if the required native libraries are currently
+            // available.  The detectors will automatically become operational once the library
+            // downloads complete on device.
+            throw new BarcodeException();
+        }
+
+
         Frame frame = new Frame.Builder().setBitmap(bitmap).build();
          return detector.detect(frame);
     }
@@ -73,19 +80,9 @@ public class ScanManager {
         return barcodeResults;
     }
 
-    public static ArrayList<String> getTestImage(Context ctx) { // TODO remove
-        Bitmap myBitmap = BitmapFactory.decodeResource(
-                ctx.getApplicationContext().getResources(),
-                R.drawable.isbn_test);
-        SparseArray<Barcode> barcodes = getBarcodes(ctx, myBitmap);
-        return getBarcodeText(barcodes);
-    }
-
 
     public static File createImageFile(Context ctx) throws IOException {
-//        File test = new File(Environment.getExternalStorageDirectory() + File.separator +  "test.jpg");
         File storageDir = ctx.getExternalCacheDir();
-//        File storageDir = ctx.getFilesDir();
         String imageFileName = "TEMP";
         File image = File.createTempFile(
                 imageFileName,  /* prefix */

@@ -1,10 +1,10 @@
 package it.jaschke.alexandria.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,13 +29,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.model.BarcodeException;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.util.NetworkManager;
 import it.jaschke.alexandria.util.ScanManager;
@@ -54,7 +56,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private File tempFile;
 
     @Bind(R.id.ean) EditText ean;
-    @Bind(R.id.scan_button) Button scanButton;
+    @Bind(R.id.scan_button) ImageButton scanButton;
     @Bind(R.id.save_button) Button saveButton;
     @Bind(R.id.delete_button) Button deleteButton;
 
@@ -64,6 +66,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Bind(R.id.categories) TextView categoriesTextView;
 
     @Bind(R.id.bookCover) ImageView bookCoverImageView;
+    @Bind(R.id.progressBar) ProgressBar progressBar;
 
     public AddBook(){
     }
@@ -252,14 +255,39 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        int f=4;
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-//            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), data);// TODO async this
+            //TODO delete tempFile
+            progressBar.setVisibility(View.VISIBLE);
+            new DecodePictureTask().execute();
+        }
+    }
+    private class DecodePictureTask extends AsyncTask<Void, Void, String> {
 
+
+        @Override
+        protected String doInBackground(Void... params) {
             Bitmap bitmap = ScanManager.getBitmap(tempFile);
-            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), bitmap);
-            int x=0;
-            x++;
+            ArrayList<String> barcodes = null;
+            try {
+                barcodes = ScanManager.getBarcodeData(getActivity(), bitmap);
+            } catch (BarcodeException e) {
+                e.printStackTrace(); //TODO thrown if play services not up to date w/link to Play Store
+            }
+            if (!barcodes.isEmpty()) {
+                return barcodes.get(0);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressBar.setVisibility(View.GONE);
+            if (result != null) {
+                ean.setText(result);
+            } else {
+                //TODO toast error
+            }
         }
     }
 }
