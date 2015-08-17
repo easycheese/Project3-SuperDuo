@@ -1,6 +1,7 @@
 package it.jaschke.alexandria.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -24,8 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +36,7 @@ import butterknife.ButterKnife;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.model.BarcodeException;
+import it.jaschke.alexandria.model.Book;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.util.NetworkManager;
 import it.jaschke.alexandria.util.ScanManager;
@@ -43,15 +44,10 @@ import it.jaschke.alexandria.util.ScanManager;
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, View.OnClickListener {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
-    private final int LOADER_ID = 1;
+    private final int LOADER_ID = 156;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
 
     private static final int REQUEST_IMAGE_CAPTURE = 153;
-    private String mScanFormat = "Format:";
-
-    private String mScanContents = "Contents:";
 
     private File tempFile;
 
@@ -127,31 +123,59 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return;
         }
 
-        String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        bookTitleTextView.setText(bookTitle);
+        Book book = new Book(data, ean.toString());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        bookSubTitleTextView.setText(bookSubTitle);
+        View dialogView = inflater.inflate(R.layout.book_add_info, null);
 
-        String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        authorsTextView.setLines(authorsArr.length);
-        authorsTextView.setText(authors.replace(",", "\n"));
-        String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            Glide.with(this).load(imgUrl)
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(bookCoverImageView);
+        ((TextView)dialogView.findViewById(R.id.add_book_authors)).setText(book.getAuthorsByRows());
+        ((TextView)dialogView.findViewById(R.id.add_book_category)).setText(book.getCategories());
+        ((TextView)dialogView.findViewById(R.id.add_book_isbn)).setText(book.getIsbn());
 
-            bookCoverImageView.setVisibility(View.VISIBLE);
-        }
+        builder.setView(dialogView)
+                // Add action buttons
+                .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // sign in the user ...
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-        String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
-        categoriesTextView.setText(categories);
+                    }
+                });
 
-        saveButton.setVisibility(View.VISIBLE);
-        deleteButton.setVisibility(View.VISIBLE);
+        AlertDialog dialog = builder.create();
+        dialog.setTitle(book.getTitle());
+
+
+        dialog.show();
+
+//        bookTitleTextView.setText(bookTitle);
+//
+
+//        bookSubTitleTextView.setText(bookSubTitle);
+//
+//        String[] authorsArr = authors.split(",");
+//        authorsTextView.setLines(authorsArr.length);
+//        authorsTextView.setText(authors.replace(",", "\n"));
+//
+//        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
+//            Glide.with(this).load(imgUrl)
+//                    .centerCrop()
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .into(bookCoverImageView);
+//
+//            bookCoverImageView.setVisibility(View.VISIBLE);
+//        }
+//
+//
+//        categoriesTextView.setText(categories);
+//
+//        saveButton.setVisibility(View.VISIBLE);
+//        deleteButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -192,10 +216,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         if(ean.length()==10 && !ean.startsWith("978")){
             ean="978"+ean;
         }
-        if(ean.length()<13){
-            clearFields();
-            return;
-        }
+//        if(ean.length()<13){ //Removed to prevent field clearing unnecessarily
+//            clearFields();
+//            return;
+//        }
 
         if (NetworkManager.hasNetworkConnection(getActivity())) {
             //Once we have an ISBN, start a book intent
@@ -214,34 +238,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onClick(View v) {
 
         if (v == scanButton) {
-            // TODO
-            // This is the callback method that the system will invoke when your button is
-            // clicked. You might do this by launching another app or by including the
-            //functionality directly in this app.
-            // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
-            // are using an external app.
-            //when you're done, remove the toast below.
-//            Context context = getActivity();
-//            CharSequence text = "This button should let you scan a book for its barcode!";
-//            int duration = Toast.LENGTH_SHORT;
-//
-//            Toast toast = Toast.makeText(context, text, duration);
-//            toast.show();
-
-
-
+            clearFields();
             try {
                 tempFile = ScanManager.createImageFile(getActivity());
                 Intent i = ScanManager.getTakePictureIntent(getActivity(), tempFile);
                 startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
             } catch (IOException e) {
-                e.printStackTrace(); //TODO handle error
+                e.printStackTrace(); //TODO handle error, test on fresh device?
+                Toast.makeText(getActivity(), "No lib found", Toast.LENGTH_SHORT).show();
             }
-
-
-//            ArrayList<String> test = ScanManager.getTestImage(getActivity());
-//            int x=0;
-//            x++;
 
         } else if (v == saveButton) {
             ean.setText("");
@@ -256,7 +261,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            //TODO delete tempFile
             progressBar.setVisibility(View.VISIBLE);
             new DecodePictureTask().execute();
         }
@@ -283,11 +287,37 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             progressBar.setVisibility(View.GONE);
+
+            tempFile.delete();
+
             if (result != null) {
                 ean.setText(result);
             } else {
                 //TODO toast error
             }
         }
+    }
+
+    public void onCreateDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Get the layout inflater
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+//        builder.setView(inflater.inflate(R.layout.dialog_signin, null))
+//                // Add action buttons
+//                .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        // sign in the user ...
+//                    }
+//                })
+//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        LoginDialogFragment.this.getDialog().cancel();
+//                    }
+//                });
+        builder.create().show();
     }
 }

@@ -166,18 +166,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
-    public void goBack(View view){
-        getSupportFragmentManager().popBackStack();
-    }
+//    Removed due to overriding user expected behavior
+//    public void goBack(View view){
+//        getSupportFragmentManager().popBackStack();
+//    }
 
 
-    @Override
-    public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()<2){
-            finish();
-        }
-        super.onBackPressed();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        if(getSupportFragmentManager().getBackStackEntryCount()<2){
+//            finish();
+//        }
+//        super.onBackPressed();
+//    }
 
 
 }
