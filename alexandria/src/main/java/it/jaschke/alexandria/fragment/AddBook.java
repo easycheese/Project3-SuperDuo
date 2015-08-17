@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -47,6 +50,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private String mScanFormat = "Format:";
 
     private String mScanContents = "Contents:";
+
+    private File tempFile;
 
     @Bind(R.id.ean) EditText ean;
     @Bind(R.id.scan_button) Button scanButton;
@@ -220,8 +225,16 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 //            Toast toast = Toast.makeText(context, text, duration);
 //            toast.show();
 
-            Intent i = ScanManager.getTakePictureIntent(getActivity());
-            startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
+
+
+            try {
+                tempFile = ScanManager.createImageFile(getActivity());
+                Intent i = ScanManager.getTakePictureIntent(getActivity(), tempFile);
+                startActivityForResult(i, REQUEST_IMAGE_CAPTURE);
+            } catch (IOException e) {
+                e.printStackTrace(); //TODO handle error
+            }
+
 
 //            ArrayList<String> test = ScanManager.getTestImage(getActivity());
 //            int x=0;
@@ -239,8 +252,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        int f=4;
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), data);// TODO async this
+//            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), data);// TODO async this
+
+            Bitmap bitmap = ScanManager.getBitmap(tempFile);
+            ArrayList<String> barcodes = ScanManager.getBarcodeResultsFromImage(getActivity(), bitmap);
             int x=0;
             x++;
         }
