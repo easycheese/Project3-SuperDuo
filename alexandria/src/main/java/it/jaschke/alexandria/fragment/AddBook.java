@@ -53,16 +53,19 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Bind(R.id.ean) EditText ean;
     @Bind(R.id.scan_button) ImageButton scanButton;
-    @Bind(R.id.save_button) Button saveButton;
-    @Bind(R.id.delete_button) Button deleteButton;
-
-    @Bind(R.id.bookTitle) TextView bookTitleTextView;
-    @Bind(R.id.bookSubTitle) TextView bookSubTitleTextView;
-    @Bind(R.id.authors) TextView authorsTextView;
-    @Bind(R.id.categories) TextView categoriesTextView;
-
-    @Bind(R.id.bookCover) ImageView bookCoverImageView;
     @Bind(R.id.progressBar) ProgressBar progressBar;
+
+
+//    @Bind(R.id.save_button) Button saveButton;
+//    @Bind(R.id.delete_button) Button deleteButton;
+
+//    @Bind(R.id.bookTitle) TextView bookTitleTextView;
+//    @Bind(R.id.bookSubTitle) TextView bookSubTitleTextView;
+//    @Bind(R.id.authors) TextView authorsTextView;
+//    @Bind(R.id.categories) TextView categoriesTextView;
+
+//    @Bind(R.id.bookCover) ImageView bookCoverImageView;
+
 
     public AddBook(){
     }
@@ -83,8 +86,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         ean.addTextChangedListener(this);
         scanButton.setOnClickListener(this);
-        saveButton.setOnClickListener(this);
-        deleteButton.setOnClickListener(this);
 
         if(savedInstanceState!=null){
             ean.setText(savedInstanceState.getString(EAN_CONTENT));
@@ -127,7 +128,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         AlertDialog dialog = getBookFragment(book);
 
         dialog.show();
-
+// Made the below a dialog fragment
 //        bookTitleTextView.setText(bookTitle);
 //
 
@@ -158,15 +159,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     }
 
-    private void clearFields(){
-        bookSubTitleTextView.setText("");
-        bookTitleTextView.setText("");
-        authorsTextView.setText("");
-        categoriesTextView.setText("");
-        bookCoverImageView.setVisibility(View.INVISIBLE);
-        saveButton.setVisibility(View.INVISIBLE);
-        deleteButton.setVisibility(View.INVISIBLE);
-    }
+//    private void clearFields(){
+//        bookSubTitleTextView.setText("");
+//        bookTitleTextView.setText("");
+//        authorsTextView.setText("");
+//        categoriesTextView.setText("");
+//        bookCoverImageView.setVisibility(View.INVISIBLE);
+//        saveButton.setVisibility(View.INVISIBLE);
+//        deleteButton.setVisibility(View.INVISIBLE);
+//    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -213,7 +214,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onClick(View v) {
 
         if (v == scanButton) {
-            clearFields();
+//            clearFields();
             try {
                 tempFile = ScanManager.createImageFile(getActivity());
                 Intent i = ScanManager.getTakePictureIntent(getActivity(), tempFile);
@@ -223,14 +224,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 Toast.makeText(getActivity(), "No lib found", Toast.LENGTH_SHORT).show();
             }
 
-        } else if (v == saveButton) {
-            ean.setText("");
-        } else if (v == deleteButton) {
-            Intent bookIntent = new Intent(getActivity(), BookService.class);
-            bookIntent.putExtra(BookService.EAN, ean.getText().toString());
-            bookIntent.setAction(BookService.DELETE_BOOK);
-            getActivity().startService(bookIntent);
-            ean.setText("");
+//        } else if (v == saveButton) {
+//            ean.setText("");
+//        } else if (v == deleteButton) {
+//            Intent bookIntent = new Intent(getActivity(), BookService.class);
+//            bookIntent.putExtra(BookService.EAN, ean.getText().toString());
+//            bookIntent.setAction(BookService.DELETE_BOOK);
+//            getActivity().startService(bookIntent);
+//            ean.setText("");
         }
     }
     @Override
@@ -268,12 +269,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             if (result != null) {
                 ean.setText(result);
             } else {
+                Toast.makeText(getActivity(), getString(R.string.isbn_empty), Toast.LENGTH_SHORT).show();
                 //TODO toast error
             }
         }
     }
 
-    public AlertDialog getBookFragment(Book book) {
+    public AlertDialog getBookFragment(final Book book) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
@@ -281,15 +283,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         builder.setView(dialogView)
                 // Add action buttons
-                .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
-                    }
-                })
+                .setPositiveButton(R.string.save_button, null)
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        Intent bookIntent = new Intent(getActivity(), BookService.class);
+                        bookIntent.putExtra(BookService.EAN, book.getIsbn());
+                        bookIntent.setAction(BookService.DELETE_BOOK);
+                        getActivity().startService(bookIntent);
                     }
                 });
 
@@ -305,8 +305,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 .into(album);
 
         builder.setTitle(book.getTitle());
-
+        builder.setCancelable(false);
         return builder.create();
-        //TODO saving a book even though not 'adding'
     }
 }

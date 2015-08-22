@@ -7,7 +7,8 @@
     android:columnCount="2"
     android:layout_margin="16dp"
     android:useDefaultMargins="true"
-    android:stretchMode="spacingWidthUniform"
+    android:columnWidth="50dp"
+
     >
 
     <TextView
@@ -19,10 +20,14 @@
         android:layout_columnSpan="2"
 
         />
-
-    <!-- TODO change wid/heig-->
-    <FrameLayout
+    <TextView
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_columnSpan="2"
+        />
+    <!-- TODO change wid/height-->
+    <FrameLayout
+        android:layout_width="150dp"
         android:layout_height="match_parent"
         android:layout_columnSpan="1"
         >
@@ -38,13 +43,18 @@
     </FrameLayout>
     <TextView
         android:id="@+id/add_book_authors"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         tools:text="Author1\nAuthor2\nBigNamedAuthor"
         android:layout_columnSpan="1"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
         />
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_columnSpan="2"
+    />
     <TextView
         android:id="@+id/add_book_category"
         android:layout_width="match_parent"

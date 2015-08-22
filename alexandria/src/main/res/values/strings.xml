@@ -33,6 +33,7 @@
     <string name="book_by">"by"</string>
     <string name="book_category">"Category: "</string>
     <string name="book_isbn">"ISBN: "</string>
+    <string name="isbn_empty">No ISBN\'s found, please try again</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there.
