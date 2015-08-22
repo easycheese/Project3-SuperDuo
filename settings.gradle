@@ -1,1 +1,1 @@
-include ':alexandria', ':football_scores', ':multi_tracker'
+include ':alexandria', ':football_scores'
