@@ -13,7 +13,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,33 +123,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return;
         }
 
-        Book book = new Book(data, ean.toString());
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        View dialogView = inflater.inflate(R.layout.book_add_info, null);
-
-        ((TextView)dialogView.findViewById(R.id.add_book_authors)).setText(book.getAuthorsByRows());
-        ((TextView)dialogView.findViewById(R.id.add_book_category)).setText(book.getCategories());
-        ((TextView)dialogView.findViewById(R.id.add_book_isbn)).setText(book.getIsbn());
-
-        builder.setView(dialogView)
-                // Add action buttons
-                .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
-                    }
-                })
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.setTitle(book.getTitle());
-
+        Book book = new Book(data, ean.getText().toString());
+        AlertDialog dialog = getBookFragment(book);
 
         dialog.show();
 
@@ -298,26 +273,40 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
     }
 
-    public void onCreateDialog() {
+    public AlertDialog getBookFragment(Book book) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-//        builder.setView(inflater.inflate(R.layout.dialog_signin, null))
-//                // Add action buttons
-//                .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        // sign in the user ...
-//                    }
-//                })
-//                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        LoginDialogFragment.this.getDialog().cancel();
-//                    }
-//                });
-        builder.create().show();
+        View dialogView = inflater.inflate(R.layout.book_info_layout, null);
+
+        builder.setView(dialogView)
+                // Add action buttons
+                .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // sign in the user ...
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+        ((TextView)dialogView.findViewById(R.id.add_book_authors)).setText(getString(R.string.book_by) + "\n" + book.getAuthorsByRows());
+        ((TextView)dialogView.findViewById(R.id.add_book_category)).setText(getString(R.string.book_category) + book.getCategories());
+        ((TextView)dialogView.findViewById(R.id.add_book_isbn)).setText(getString(R.string.book_isbn) +book.getIsbn());
+
+        ImageView album = ((ImageView)dialogView.findViewById(R.id.add_book_image));
+
+        Glide.with(getActivity()).load(book.getImageUrl())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(album);
+
+        builder.setTitle(book.getTitle());
+
+        return builder.create();
+        //TODO saving a book even though not 'adding'
     }
 }

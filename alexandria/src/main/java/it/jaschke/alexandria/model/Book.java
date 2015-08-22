@@ -41,6 +41,7 @@ public class Book {
     }
 
     public String getAuthorsByRows() {
+
         return authors.replace(",", "\n");
     }
 
