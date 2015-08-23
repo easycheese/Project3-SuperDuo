@@ -5,14 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,14 +19,13 @@ import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import it.jaschke.alexandria.api.Callback;
+import it.jaschke.alexandria.fragment.About;
 import it.jaschke.alexandria.fragment.AddBook;
 import it.jaschke.alexandria.fragment.BookDetail;
 import it.jaschke.alexandria.fragment.ListOfBooks;
@@ -52,6 +48,8 @@ public class MainActivity extends ActionBarActivity implements Callback {
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    private static int navPosition=99;
+    private static final String navPosition_saved = "navPosition";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +63,20 @@ public class MainActivity extends ActionBarActivity implements Callback {
 //        }else {
 //            setContentView(R.layout.activity_main);
 //        }
+        if (savedInstanceState != null) {
+            navPosition = savedInstanceState.getInt(navPosition_saved);
+        }
 
         messageReciever = new messageReceiver();
         IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever, filter);
         setupNav();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(navPosition_saved, navPosition);
+        super.onSaveInstanceState(outState);
     }
 
     private void setupNav() {
@@ -105,13 +112,18 @@ public class MainActivity extends ActionBarActivity implements Callback {
                     }
                 })
                 .build();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int defaultScreen = Integer.parseInt(prefs.getString("pref_startFragment","0"));
-        result.setSelection(defaultScreen,true);
+
+        if (navPosition == 99) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            navPosition = Integer.parseInt(prefs.getString("pref_startFragment","0"));
+        }
+
+        result.setSelection(navPosition,true);
 
 
     }
     public void onNavSelection(int position) {
+        navPosition = position;
         Fragment nextFragment;
         int title;
         switch (position){
@@ -224,10 +236,13 @@ public class MainActivity extends ActionBarActivity implements Callback {
         if(findViewById(R.id.right_container) != null){
             id = R.id.right_container;
         }
-        getSupportFragmentManager().beginTransaction()
-                .replace(id, fragment)
-                .addToBackStack("Book Detail")
-                .commit();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(id, fragment)
+//                .addToBackStack("Book Detail")
+//                .commit();
+        Intent i = new Intent(MainActivity.this, BookDetailsActivity.class);
+        i.putExtras(args);
+        startActivity(i);
     }
 
     private class messageReceiver extends BroadcastReceiver {

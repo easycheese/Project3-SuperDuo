@@ -11,35 +11,35 @@
         android:layout_height="match_parent"
         android:fillViewport="false"
         android:layout_weight="1"
-        android:layout_margin="@dimen/margin_standard">
+        >
 
         <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal|top">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_margin="@dimen/margin_standard"
+            >
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/fullBookTitle"
-                android:textSize="@dimen/head_line"
-                android:textIsSelectable="true"
-                android:textStyle="bold"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_margin="10dp"
-                tools:text="title"/>
+            <!--<TextView-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/fullBookTitle"-->
+                <!--android:textSize="@dimen/head_line"-->
+                <!--android:textIsSelectable="true"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:layout_alignParentStart="true"-->
+                <!--android:layout_margin="10dp"-->
+                <!--tools:text="title"/>-->
 
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:id="@+id/fullBookCover"
                 android:contentDescription="@string/book_cover"
-                android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/fullBookTitle"
                 android:paddingTop="8dp"/>
 
             <TextView

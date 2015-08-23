@@ -1,8 +1,10 @@
 package it.jaschke.alexandria.fragment;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -24,24 +26,27 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import it.jaschke.alexandria.BookDetailsActivity;
 import it.jaschke.alexandria.MainActivity;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.model.Book;
 import it.jaschke.alexandria.services.BookService;
 
 
-public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
+public class BookDetail extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     public static final String EAN_KEY = "EAN";
     private final int LOADER_ID = 10;
 
     private String ean;
-    private String bookTitle;
-    private ShareActionProvider shareActionProvider;
+    private Book book;
+////    private String bookTitle;
+//    private ShareActionProvider shareActionProvider;
     private View rootView;
 
     @Bind(R.id.delete_button) Button deleteButton;
-    @Bind(R.id.fullBookTitle) TextView fullBookTitle;
+//    @Bind(R.id.fullBookTitle) TextView fullBookTitle;
     @Bind(R.id.fullBookSubTitle) TextView fullBookSubTitle;
     @Bind(R.id.fullBookDesc) TextView fullBookDesc;
     @Bind(R.id.authors) TextView authorsTextView;
@@ -63,7 +68,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Bundle arguments = getArguments();
+        Bundle arguments = getActivity().getIntent().getExtras();
         if (arguments != null) {
             ean = arguments.getString(BookDetail.EAN_KEY);
             getLoaderManager().restartLoader(LOADER_ID, null, this);
@@ -78,14 +83,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.book_detail, menu);
-
-        MenuItem menuItem = menu.findItem(R.id.action_share);
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-    }
-
-    @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
                 getActivity(),
@@ -97,34 +94,49 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         );
     }
 
+    public Intent getShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+ book.getTitle());
+        return shareIntent;
+    }
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
             return;
         }
 
-        bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-        fullBookTitle.setText(bookTitle);
+        book = new Book(data, ean);
 
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
-        shareActionProvider.setShareIntent(shareIntent);
+//        bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+//        fullBookTitle.setText(book.getTitle());
 
-        String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-        fullBookSubTitle.setText(bookSubTitle);
+        BookDetailsActivity activity = (BookDetailsActivity) getActivity();
+        activity.setTitle(book.getTitle());
 
-        String desc = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
-        fullBookDesc.setText(desc);
+//        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+//        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+//        shareIntent.setType("text/plain");
+//        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+ book.getTitle());
+//        activity.setShareIntent(shareIntent);
 
-        String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        authorsTextView.setLines(authorsArr.length);
-        authorsTextView.setText(authors.replace(",","\n"));
-        String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            Glide.with(this).load(imgUrl)
+//        shareActionProvider.setShareIntent(shareIntent);
+
+//        String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
+        fullBookSubTitle.setText(book.getSubTitle());
+
+//        String desc = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
+        fullBookDesc.setText(book.getDescription());
+
+//        String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
+//        String[] authorsArr = authors.split(",");
+//        authorsTextView.setLines(authorsArr.length);
+//        authorsTextView.setText(authors.replace(",","\n"));
+        authorsTextView.setText(book.getAuthorsByRows());
+//        String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
+        if(Patterns.WEB_URL.matcher(book.getImageUrl()).matches()){
+            Glide.with(this).load(book.getImageUrl())
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(bookCoverImage);
@@ -132,8 +144,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             bookCoverImage.setVisibility(View.VISIBLE);
         }
 
-        String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
-        categoriesTextView.setText(categories);
+//        String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
+        categoriesTextView.setText(book.getCategories());
 
 //        if(rootView.findViewById(R.id.right_container)!=null){
 //            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
@@ -161,7 +173,8 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             bookIntent.putExtra(BookService.EAN, ean);
             bookIntent.setAction(BookService.DELETE_BOOK);
             getActivity().startService(bookIntent);
-            getActivity().getSupportFragmentManager().popBackStack();
+//            getActivity().getSupportFragmentManager().popBackStack();
+            getActivity().finish();
         }
     }
 }

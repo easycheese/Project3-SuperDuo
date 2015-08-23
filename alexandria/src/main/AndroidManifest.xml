@@ -33,7 +33,7 @@
                 android:value=".MainActivity" />
         </activity>
 
-
+        <activity android:name=".BookDetailsActivity"/>
 
         <provider
             android:name=".data.BookProvider"

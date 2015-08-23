@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    tools:context=".MainActivity" android:orientation="vertical">
+
+    <include layout="@layout/my_toolbar"
+        android:id="@+id/toolbar"
+        />
+
+    <fragment android:name="it.jaschke.alexandria.fragment.BookDetail"
+        android:id="@+id/viewer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

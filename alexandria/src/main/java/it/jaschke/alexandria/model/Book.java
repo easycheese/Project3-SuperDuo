@@ -14,6 +14,7 @@ public class Book {
     private String imageUrl;
     private String categories;
     private String isbn;
+    private String description;
 
     public Book(Cursor data, String isbn) {
         categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
@@ -21,6 +22,7 @@ public class Book {
         authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
         subTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
         title = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
+        description = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
         this.isbn = isbn;
     }
 
@@ -47,5 +49,9 @@ public class Book {
 
     public String getIsbn() {
         return isbn;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
