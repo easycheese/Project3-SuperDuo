@@ -245,19 +245,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
     }
     private class DecodePictureTask extends AsyncTask<Void, Void, String> {
-
+        private String eanTask;
 
         @Override
         protected String doInBackground(Void... params) {
             Bitmap bitmap = ScanManager.getBitmap(tempFile);
             ArrayList<String> barcodes = null;
+
             try {
+
                 barcodes = ScanManager.getBarcodeData(getActivity(), bitmap);
             } catch (BarcodeException e) {
                 e.printStackTrace(); //TODO thrown if play services not up to date w/link to Play Store
             }
-            if (!barcodes.isEmpty()) {
-                return barcodes.get(0);
+            if (barcodes != null && !barcodes.isEmpty()) {
+                eanTask = barcodes.get(0);
             }
             return null;
         }
@@ -269,8 +271,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             tempFile.delete();
 
-            if (result != null) {
-                ean.setText(result);
+            if (eanTask != null) {
+                ean.setText(eanTask);
             } else {
                 Toast.makeText(getActivity(), getString(R.string.isbn_empty), Toast.LENGTH_SHORT).show();
             }

@@ -62,7 +62,7 @@ public class ScanManager {
             // isOperational() can be used to check if the required native libraries are currently
             // available.  The detectors will automatically become operational once the library
             // downloads complete on device.
-            throw new BarcodeException();
+            throw new BarcodeException();  //TODO add error data to pull out in async
         }
 
 

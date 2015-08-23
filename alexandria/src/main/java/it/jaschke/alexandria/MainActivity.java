@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -232,10 +233,10 @@ public class MainActivity extends ActionBarActivity implements Callback {
         BookDetail fragment = new BookDetail();
         fragment.setArguments(args);
 
-        int id = R.id.container;
-        if(findViewById(R.id.right_container) != null){
-            id = R.id.right_container;
-        }
+//        int id = R.id.container;
+//        if(findViewById(R.id.right_container) != null){
+//            id = R.id.right_container;
+//        }
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(id, fragment)
 //                .addToBackStack("Book Detail")
