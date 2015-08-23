@@ -4,36 +4,49 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.fragment.AddBook;
 import it.jaschke.alexandria.fragment.BookDetail;
 import it.jaschke.alexandria.fragment.ListOfBooks;
 
 
-public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks, Callback {
+public class MainActivity extends ActionBarActivity implements Callback {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-    private NavigationDrawerFragment navigationDrawerFragment;
+//    private NavigationDrawerFragment navigationDrawerFragment;
+    @Bind(R.id.toolbar) Toolbar toolbar;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
-    private CharSequence title;
+//    private CharSequence title;
 //    public static boolean IS_TABLET = false;
     private BroadcastReceiver messageReciever;
 
@@ -44,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
 
 //        IS_TABLET = isTablet();
 //        if(IS_TABLET){ //TODO
@@ -55,39 +68,95 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         messageReciever = new messageReceiver();
         IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever,filter);
-
-        navigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        title = getTitle();
-
-        // Set up the drawer.
-        navigationDrawerFragment.setUp(R.id.navigation_drawer,
-                    (DrawerLayout) findViewById(R.id.drawer_layout));
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever, filter);
+        setupNav();
     }
 
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    private void setupNav() {
+        //Removed navigation drawer (not to guidelines)
+//        navigationDrawerFragment = (NavigationDrawerFragment)
+//                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+//        title = getTitle();
+//
+//        // Set up the drawer.
+//        navigationDrawerFragment.setUp(R.id.navigation_drawer,
+//                (DrawerLayout) findViewById(R.id.drawer_layout));
+
+//        toolbar.inflateMenu(R.menu.main);
+        setSupportActionBar(toolbar);
+
+        PrimaryDrawerItem item0 = new PrimaryDrawerItem().withName(R.string.books).withIdentifier(0);
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withName(R.string.scan).withIdentifier(1);
+        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withName(R.string.about).withIdentifier(2);
+
+        Drawer result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        item0,
+                        item1,
+                        item2
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        onNavSelection(position);
+                        return false;
+                    }
+                })
+                .build();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int defaultScreen = Integer.parseInt(prefs.getString("pref_startFragment","0"));
+        result.setSelection(defaultScreen,true);
 
 
+    }
+    public void onNavSelection(int position) {
         Fragment nextFragment;
-
+        int title;
         switch (position){
             default:
             case 0:
+                title = R.string.books;
                 nextFragment = new ListOfBooks();
                 break;
             case 1:
+                title = R.string.scan;
                 nextFragment = new AddBook();
                 break;
             case 2:
+                title = R.string.about;
                 nextFragment = new About();
                 break;
 
         }
-
+        toolbar.setTitle(getString(title));
         addFragment(nextFragment);
+
+
     }
+//    @Override
+//    public void onNavigationDrawerItemSelected(int position) {
+//
+//
+//        Fragment nextFragment;
+//
+//        switch (position){
+//            default:
+//            case 0:
+//                nextFragment = new ListOfBooks();
+//                break;
+//            case 1:
+//                nextFragment = new AddBook();
+//                break;
+//            case 2:
+//                nextFragment = new About();
+//                break;
+//
+//        }
+//
+//        addFragment(nextFragment);
+//    }
     private void addFragment(Fragment nextFragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -96,28 +165,29 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 .commit();
     }
 
-    public void setTitle(int titleId) {
-        title = getString(titleId);
-    }
+//    public void setTitle(int titleId) {
+//        title = getString(titleId);
+//    }
 
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(title);
-    }
+//    public void restoreActionBar() {
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//        actionBar.setDisplayShowTitleEnabled(true);
+//        actionBar.setTitle(title);
+//    }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!navigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
-            return true;
-        }
+        getMenuInflater().inflate(R.menu.main, menu);
+//        if (!navigationDrawerFragment.isDrawerOpen()) {
+//            // Only show items in the action bar relevant to this screen
+//            // if the drawer is not showing. Otherwise, let the drawer
+//            // decide what to show in the action bar.
+//            getMenuInflater().inflate(R.menu.main, menu);
+//            restoreActionBar();
+//            return true;
+//        }
         return super.onCreateOptionsMenu(menu);
     }
 
