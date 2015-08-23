@@ -124,7 +124,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return;
         }
 
-        Book book = new Book(data, ean.getText().toString());
+        Book book = new Book(data, ean.getText().toString(), getContext());
         AlertDialog dialog = getBookFragment(book);
 
         dialog.show();
@@ -246,6 +246,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
     private class DecodePictureTask extends AsyncTask<Void, Void, String> {
         private String eanTask;
+        private String errorMessage;
 
         @Override
         protected String doInBackground(Void... params) {
@@ -257,6 +258,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 barcodes = ScanManager.getBarcodeData(getActivity(), bitmap);
             } catch (BarcodeException e) {
                 e.printStackTrace(); //TODO thrown if play services not up to date w/link to Play Store
+                errorMessage = e.getMessage();
             }
             if (barcodes != null && !barcodes.isEmpty()) {
                 eanTask = barcodes.get(0);
@@ -273,6 +275,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             if (eanTask != null) {
                 ean.setText(eanTask);
+            } else if (errorMessage != null){
+                Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getActivity(), getString(R.string.isbn_empty), Toast.LENGTH_SHORT).show();
             }

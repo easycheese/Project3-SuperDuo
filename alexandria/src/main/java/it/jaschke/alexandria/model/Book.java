@@ -1,7 +1,9 @@
 package it.jaschke.alexandria.model;
 
+import android.content.Context;
 import android.database.Cursor;
 
+import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 /**
@@ -16,13 +18,18 @@ public class Book {
     private String isbn;
     private String description;
 
-    public Book(Cursor data, String isbn) {
+    public Book(Cursor data, String isbn, Context ctx) {
         categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
         imageUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
         subTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
         title = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
         description = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.DESC));
+
+        if (categories == null) {
+            categories = ctx.getString(R.string.null_info);
+        }
+
         this.isbn = isbn;
     }
 

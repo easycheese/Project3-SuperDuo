@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.model.BarcodeException;
 
 
@@ -62,7 +63,7 @@ public class ScanManager {
             // isOperational() can be used to check if the required native libraries are currently
             // available.  The detectors will automatically become operational once the library
             // downloads complete on device.
-            throw new BarcodeException();  //TODO add error data to pull out in async
+            throw new BarcodeException(ctx.getString(R.string.error_detector));  //TODO add error data to pull out in async
         }
 
 

@@ -107,7 +107,7 @@ public class BookDetail extends DialogFragment implements LoaderManager.LoaderCa
             return;
         }
 
-        book = new Book(data, ean);
+        book = new Book(data, ean, getActivity());
 
 //        bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
 //        fullBookTitle.setText(book.getTitle());
