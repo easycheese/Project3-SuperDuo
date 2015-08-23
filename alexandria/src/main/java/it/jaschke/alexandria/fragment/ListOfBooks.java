@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,8 @@ import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
 
 
-public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener, AdapterView.OnItemClickListener{
+public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+         AdapterView.OnItemClickListener, TextWatcher {
 
     private BookListAdapter bookListAdapter;
     private int position = ListView.INVALID_POSITION;
@@ -31,7 +34,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private final int LOADER_ID = 10;
 
     @Bind(R.id.searchText) EditText searchText;
-    @Bind(R.id.searchButton) Button searchButton;
     @Bind(R.id.listOfBooks) ListView bookList;
 
     public ListOfBooks() {
@@ -57,11 +59,17 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
 
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
         ButterKnife.bind(this, rootView);
-        searchButton.setOnClickListener(this);
+
         bookList.setAdapter(bookListAdapter);
         bookList.setOnItemClickListener(this);
-
+        searchText.addTextChangedListener(this);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        restartLoader();
     }
 
     private void restartLoader(){
@@ -115,12 +123,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         activity.setTitle(R.string.books);
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v == searchButton) {
-            ListOfBooks.this.restartLoader();
-        }
-    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -129,5 +131,20 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             ((Callback)getActivity())
                     .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        restartLoader();
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

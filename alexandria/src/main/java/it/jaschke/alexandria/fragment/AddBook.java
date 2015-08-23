@@ -89,7 +89,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         if(savedInstanceState!=null){
             ean.setText(savedInstanceState.getString(EAN_CONTENT));
-            ean.setHint("");
+//            ean.setHint("");
         }
 
         return rootView;
@@ -187,8 +187,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public void afterTextChanged(Editable s) {
-        String ean =s.toString();
+        String ean = s.toString();
         //catch isbn10 numbers
+        if (ean.equals("")) {
+            return;
+        }
         if(ean.length()==10 && !ean.startsWith("978")){
             ean="978"+ean;
         }
@@ -290,11 +293,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 })
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent bookIntent = new Intent(getActivity(), BookService.class);
-                        bookIntent.putExtra(BookService.EAN, book.getIsbn());
-                        bookIntent.setAction(BookService.DELETE_BOOK);
-                        getActivity().startService(bookIntent);
-                        ean.setText("");
+                        deleteBook(book);
                     }
                 });
 
@@ -310,7 +309,19 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 .into(album);
 
         builder.setTitle(book.getTitle());
-        builder.setCancelable(false);
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                deleteBook(book);
+            }
+        });
         return builder.create();
+    }
+    private void deleteBook(Book book) {
+        Intent bookIntent = new Intent(getActivity(), BookService.class);
+        bookIntent.putExtra(BookService.EAN, book.getIsbn());
+        bookIntent.setAction(BookService.DELETE_BOOK);
+        getActivity().startService(bookIntent);
+        ean.setText("");
     }
 }

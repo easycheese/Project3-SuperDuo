@@ -9,17 +9,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     >
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/searchButton"
-        android:src="@drawable/ic_action_search"
-        android:contentDescription="@string/search"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentEnd="true"/>
+
 
     <EditText
         android:layout_width = "fill_parent"
@@ -27,11 +17,9 @@
         android:id="@+id/searchText"
         android:inputType="text"
         android:saveEnabled="true"
-        android:text="@string/search"
+        android:hint="@string/search"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
-        android:layout_toLeftOf="@+id/searchButton"
-        android:layout_toStartOf="@+id/searchButton"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"/>
@@ -43,10 +31,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="0dp"
         android:layout_below="@+id/searchText"
-        android:layout_alignRight="@id/searchButton"
         android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_toRightOf="@id/searchButton"/>
+        android:layout_alignParentStart="true"/>
 
 
 </RelativeLayout>
