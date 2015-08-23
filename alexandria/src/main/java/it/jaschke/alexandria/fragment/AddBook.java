@@ -270,7 +270,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 ean.setText(result);
             } else {
                 Toast.makeText(getActivity(), getString(R.string.isbn_empty), Toast.LENGTH_SHORT).show();
-                //TODO toast error
             }
         }
     }
@@ -283,13 +282,19 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         builder.setView(dialogView)
                 // Add action buttons
-                .setPositiveButton(R.string.save_button, null)
+                .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ean.setText("");
+                    }
+                })
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent bookIntent = new Intent(getActivity(), BookService.class);
                         bookIntent.putExtra(BookService.EAN, book.getIsbn());
                         bookIntent.setAction(BookService.DELETE_BOOK);
                         getActivity().startService(bookIntent);
+                        ean.setText("");
                     }
                 });
 

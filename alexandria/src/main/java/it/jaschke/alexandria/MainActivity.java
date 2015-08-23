@@ -69,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+
         Fragment nextFragment;
 
         switch (position){
@@ -86,9 +86,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         }
 
+        addFragment(nextFragment);
+    }
+    private void addFragment(Fragment nextFragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
-                .addToBackStack((String) title)
+//                .addToBackStack((String) title)
                 .commit();
     }
 
@@ -138,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onDestroy();
     }
 
-    @Override
+    @Override // Callback from bookList
     public void onItemSelected(String ean) {
         Bundle args = new Bundle();
         args.putString(BookDetail.EAN_KEY, ean);
@@ -154,7 +158,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 .replace(id, fragment)
                 .addToBackStack("Book Detail")
                 .commit();
-
     }
 
     private class messageReceiver extends BroadcastReceiver {
