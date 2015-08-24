@@ -1,11 +1,14 @@
 package barqsoft.footballscores.service;
 
 import android.app.IntentService;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,11 +22,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
 
 import barqsoft.footballscores.content.DatabaseContract;
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.widget.AppWidgetProvider;
 
 /**
  * Created by yehya khaled on 3/2/2015.
@@ -41,7 +46,7 @@ public class myFetchService extends IntentService
     {
         getData("n2");
         getData("p2");
-
+        updateWidgets();
         return;
     }
 
@@ -131,6 +136,18 @@ public class myFetchService extends IntentService
         catch(Exception e)
         {
             Log.e(LOG_TAG,e.getMessage());
+        }
+
+    }
+    private void updateWidgets() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this
+                .getApplicationContext());
+        int[] ids = appWidgetManager.getAppWidgetIds(new ComponentName(getApplicationContext(), AppWidgetProvider.class));
+        for(int widgetId:ids) {
+            RemoteViews views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widget_layout);
+            int number = (new Random().nextInt(10000));
+            views.setTextViewText(R.id.score, number + "");
+            appWidgetManager.updateAppWidget(widgetId,views);
         }
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)

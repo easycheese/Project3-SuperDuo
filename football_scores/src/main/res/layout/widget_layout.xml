@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dip"
-    android:background="@drawable/myshape" >
+    android:orientation="horizontal"
+    android:background="@drawable/widget_background" >
 
     <TextView
-        android:id="@+id/update"
+        android:id="@+id/home"
         style="@android:style/TextAppearance.Medium"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center_horizontal|center_vertical"
         android:layout_margin="4dip"
-        android:text="Static Text" >
+        tools:text="Home Team" >
     </TextView>
-
+    <TextView
+        android:id="@+id/score"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_margin="4dip"
+        tools:text="3 - 2" >
+    </TextView>
+    <TextView
+        android:id="@+id/away"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_margin="4dip"
+        tools:text="Away Team" >
+    </TextView>
 </LinearLayout> 
