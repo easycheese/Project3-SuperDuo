@@ -1,11 +1,11 @@
-package barqsoft.footballscores;
+package barqsoft.footballscores.content;
 
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by yehya khaled on 2/25/2015.
+ * Created by yehya khaled on 2/25/2015
  */
 public class DatabaseContract
 {

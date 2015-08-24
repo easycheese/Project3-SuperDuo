@@ -3,13 +3,15 @@ package barqsoft.footballscores;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import barqsoft.footballscores.model.Match;
+import barqsoft.footballscores.model.ViewHolder;
 
 /**
  * Created by yehya khaled on 2/26/2015.
@@ -75,7 +77,7 @@ public class scoresAdapter extends CursorAdapter
                 {
                     //add Share Action
                     context.startActivity(createShareForecastIntent(mHolder.home_name.getText()+" "
-                    +mHolder.score.getText()+" "+mHolder.away_name.getText() + " "));
+                    +mHolder.score.getText()+" " + mHolder.away_name.getText() + " "));
                 }
             });
         }

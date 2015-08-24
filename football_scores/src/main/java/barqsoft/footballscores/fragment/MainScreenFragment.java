@@ -13,9 +13,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.content.DatabaseContract;
 import barqsoft.footballscores.R;
-import barqsoft.footballscores.ViewHolder;
+import barqsoft.footballscores.model.ViewHolder;
 import barqsoft.footballscores.activity.MainActivity;
 import barqsoft.footballscores.scoresAdapter;
 import barqsoft.footballscores.service.myFetchService;

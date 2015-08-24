@@ -1,6 +1,8 @@
-package barqsoft.footballscores;
+package barqsoft.footballscores.model;
 
 import android.database.Cursor;
+
+import barqsoft.footballscores.content.DatabaseContract;
 
 /**
  * Created by Laptop on 8/23/2015

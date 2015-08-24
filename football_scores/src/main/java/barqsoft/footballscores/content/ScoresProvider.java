@@ -1,4 +1,4 @@
-package barqsoft.footballscores;
+package barqsoft.footballscores.content;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
- * Created by yehya khaled on 2/25/2015.
+ * Created by yehya khaled on 2/25/2015
  */
 public class ScoresProvider extends ContentProvider
 {
