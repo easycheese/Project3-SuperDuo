@@ -52,6 +52,7 @@ public class myFetchService extends IntentService
 
     private void getData (String timeFrame)
     {
+        Log.v(LOG_TAG, "getting data");
         //Creating fetch URL
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures"; //Base URL
         final String QUERY_TIME_FRAME = "timeFrame"; //Time Frame parameter to determine days
@@ -193,6 +194,7 @@ public class myFetchService extends IntentService
         String match_id = null;
         String match_day = null;
 
+        Log.v(LOG_TAG, "Processing data");
 
         try {
             JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
@@ -279,7 +281,7 @@ public class myFetchService extends IntentService
             inserted_data = mContext.getContentResolver().bulkInsert(
                     DatabaseContract.BASE_CONTENT_URI,insert_data);
 
-            //Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
+            Log.v(LOG_TAG,"Succesfully Inserted : " + String.valueOf(inserted_data));
         }
         catch (JSONException e)
         {

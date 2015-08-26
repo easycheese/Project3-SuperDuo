@@ -23,7 +23,9 @@
 
         <provider
             android:name=".content.ScoresProvider"
-            android:authorities="barqsoft.footballscores" />
+            android:authorities="barqsoft.footballscores"
+            android:exported="true"/>
+        <!-- TODO delete exported line-->
 
         <activity
             android:name=".activity.AboutActivity"

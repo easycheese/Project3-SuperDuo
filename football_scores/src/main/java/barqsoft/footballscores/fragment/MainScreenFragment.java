@@ -1,7 +1,9 @@
 package barqsoft.footballscores.fragment;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -12,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import barqsoft.footballscores.content.DatabaseContract;
 import barqsoft.footballscores.R;
@@ -51,19 +56,30 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
         final ListView score_list = (ListView) rootView.findViewById(R.id.scores_list);
         mAdapter = new scoresAdapter(getActivity(),null,0);
         score_list.setAdapter(mAdapter);
-        getLoaderManager().initLoader(SCORES_LOADER,null,this);
+//        getLoaderManager().initLoader(SCORES_LOADER,null,this); TODO
         mAdapter.detail_match_id = MainActivity.selected_match_id;
-        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        score_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ViewHolder selected = (ViewHolder) view.getTag();
                 mAdapter.detail_match_id = selected.match_id;
                 MainActivity.selected_match_id = (int) selected.match_id;
                 mAdapter.notifyDataSetChanged();
             }
         });
+
+        String[] dateArgs = new String[1];
+        Date fragmentdate = new Date(System.currentTimeMillis());
+        SimpleDateFormat mformat = new SimpleDateFormat("yyyy-MM-dd");
+
+        dateArgs[0] = mformat.format(fragmentdate);
+        Uri test = DatabaseContract.scores_table.buildScoreWithDate();
+        ContentResolver cr = getActivity().getContentResolver();
+        Cursor c = cr.query(DatabaseContract.scores_table.buildScoreWithDate(),
+                DatabaseContract.scores_table.allColumns, null, dateArgs, null);
+
+        Boolean result = c.moveToFirst(); //TODO
+
         return rootView;
     }
 

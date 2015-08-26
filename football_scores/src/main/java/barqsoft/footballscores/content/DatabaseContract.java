@@ -4,6 +4,8 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import java.util.Date;
+
 /**
  * Created by yehya khaled on 2/25/2015
  */
@@ -22,6 +24,9 @@ public class DatabaseContract
         public static final String AWAY_GOALS_COL = "away_goals";
         public static final String MATCH_ID = "match_id";
         public static final String MATCH_DAY = "match_day";
+
+        public static final String[] allColumns = { LEAGUE_COL, DATE_COL, TIME_COL, HOME_COL, AWAY_COL, HOME_GOALS_COL,
+            AWAY_GOALS_COL, MATCH_DAY, MATCH_ID};
 
         //public static Uri SCORES_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH)
                 //.build();
